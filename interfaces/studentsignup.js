@@ -1,43 +1,46 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView } from 'react-native';
-import { collection, addDoc } from "firebase/firestore"; 
-
-// Import Firebase configuration
+import { auth, createUserWithEmailAndPassword } from '../firebase/config';
+import { collection, addDoc } from 'firebase/firestore';
 import { useFirestore } from '../firebase/config';
+import Dashboard from './dashboard';
 
 const StudentSignup = ({ navigation }) => {
   const [firstname, setFirstname] = useState('');
   const [lastname, setLastname] = useState('');
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
-  // const firestore = useFirestore();
 
   const handleSignup = async () => {
     try {
-      // Add student signup logic here
-      const studentData = await addDoc(collection(useFirestore, 'Students'), {
+      // Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Access user from userCredential
+      const user = userCredential.user;
+  
+      // Add student data to Firestore
+      await addDoc(collection(useFirestore, 'Students'), {
         firstname,
         lastname,
-        username,
-        password,
         email,
         phone,
+        userId: user.uid, // Add user ID to student data
       });
-
-      // Store the data in Firebase Firestore
-      
-
+  
       console.log('Signup successful');
+      navigation.navigate('Dashboard'); // Navigate to a different screen after successful signup
     } catch (error) {
       console.error('Error during signup:', error);
     }
   };
+  
+  
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column',justifyContent: 'center',}} behavior="padding" enabled   keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column', justifyContent: 'center' }} behavior="padding" enabled keyboardVerticalOffset={100}>
       <ScrollView contentContainerStyle={styles.container}>
         <TextInput
           style={styles.input}
@@ -51,13 +54,6 @@ const StudentSignup = ({ navigation }) => {
           placeholder="Last Name"
           onChangeText={(text) => setLastname(text)}
           value={lastname}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          onChangeText={(text) => setUsername(text)}
-          value={username}
         />
 
         <TextInput

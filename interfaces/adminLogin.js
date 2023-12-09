@@ -8,6 +8,8 @@ import { useFirestore } from '../firebase/config';
 const AdminLogin = ({ navigation }) => {
   const [selectedHostel, setSelectedHostel] = useState(null);
   const [hostels, setHostels] = useState([]);
+  const [email, setemail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Fetch hostels from Firestore on component mount
   useEffect(() => {
@@ -60,9 +62,21 @@ const AdminLogin = ({ navigation }) => {
         )}
       />
 
-      <TextInput style={styles.input} placeholder="Username" />
+      <TextInput
+        style={styles.input}
+        placeholder="email"
+        onChangeText={(text) => setemail(text)}
+        value={email}
+      />
 
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry />
+      {/* Password input field */}
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        onChangeText={(text) => setPassword(text)}
+        value={password}
+        secureTextEntry
+      />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>

@@ -1,31 +1,41 @@
 // Import necessary components from React and React Native
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { auth, signInWithEmailAndPassword } from '../firebase/config';
 import AdminLogin from './adminLogin';
 import StudentSignup from './studentsignup';
 import Dashboard from './dashboard';
 
 // Create a functional component for the login page
 const Login = ({ navigation }) => {
-  // State variables to store username and password
-  const [username, setUsername] = useState('');
+  // State variables to store email and password
+  const [email, setemail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Function to handle login button press
-  const handleLogin = () => {
-    // Add authentication logic here
-    // For simplicity, let's just navigate to a dashboard page
-    navigation.navigate('Dashboard');
+  const handleLogin = async () => {
+    try {
+      // Call the signInWithEmailAndPassword function
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  
+      // Access the user from userCredential
+      const user = userCredential.user;
+  
+      // For simplicity, navigate to the Dashboard component after successful login
+      navigation.navigate('Dashboard');
+    } catch (error) {
+      // Handle login error
+      console.error('Error during login:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Username input field */}
+      {/* email input field */}
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        onChangeText={(text) => setUsername(text)}
-        value={username}
+        placeholder="email"
+        onChangeText={(text) => setemail(text)}
+        value={email}
       />
 
       {/* Password input field */}
