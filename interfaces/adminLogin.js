@@ -1,71 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { collection, getDocs } from 'firebase/firestore';
-import { useFirestore } from '../firebase/config';
+import { auth, signInWithEmailAndPassword } from '../firebase/config';
 
 const AdminLogin = ({ navigation }) => {
-  const [selectedHostel, setSelectedHostel] = useState(null);
-  const [hostels, setHostels] = useState([]);
-  const [email, setemail] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Fetch hostels from Firestore on component mount
-  useEffect(() => {
-    const fetchHostels = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(useFirestore, 'Hostels'));
-        const hostelList = [];
-        querySnapshot.forEach((doc) => {
-          const { name } = doc.data();
-          hostelList.push({ label: name, value: name });
-        });
-
-        // Append the newly fetched hostels to the existing ones
-        setHostels((prevHostels) => [...prevHostels, ...hostelList]);
-      } catch (error) {
-        console.error('Error fetching hostels:', error);
+  const handleLogin = async () => {
+    try {
+      // Verify if the email ends with "@admin.com"
+      if (!email.endsWith('@admin.com')) {
+        console.error('Invalid email. Please use an admin email.');
+        return;
       }
-    };
 
-    fetchHostels();
-  }, [useFirestore]);
+      // Authenticate user using Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-  const handleLogin = () => {
-    // Add authentication logic here
-    // For simplicity, leaving it empty for now
-    navigation.navigate('AdminDashboard');
+      // Access the user from userCredential
+      const user = userCredential.user;
+
+      // For simplicity, you can navigate to the AdminDashboard component after successful login
+      navigation.navigate('AdminDashboard');
+    } catch (error) {
+      // Handle login error
+      console.error('Error during login:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={hostels}
-        search
-        maxHeight={200}
-        labelField="label"
-        valueField="value"
-        placeholder="Select Hostel"
-        searchPlaceholder="Search..."
-        value={selectedHostel}
-        onChange={(item) => {
-          setSelectedHostel(item.value);
-        }}
-        renderLeftIcon={() => (
-          <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
-        )}
-      />
-
       <TextInput
         style={styles.input}
-        placeholder="email"
-        onChangeText={(text) => setemail(text)}
+        placeholder="Email"
+        onChangeText={(text) => setEmail(text)}
         value={email}
       />
 
@@ -85,17 +53,11 @@ const AdminLogin = ({ navigation }) => {
   );
 };
 
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  dropdown: {
-    width: '80%',
-    marginVertical: 10,
   },
   input: {
     width: '80%',
@@ -114,23 +76,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     textAlign: 'center',
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
   },
 });
 

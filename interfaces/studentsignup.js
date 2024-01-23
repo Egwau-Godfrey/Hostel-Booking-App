@@ -12,15 +12,14 @@ const StudentSignup = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
-
   const handleSignup = async () => {
     try {
       // Create user in Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       // Access user from userCredential
       const user = userCredential.user;
-  
+
       // Add student data to Firestore
       await addDoc(collection(useFirestore, 'Students'), {
         firstname,
@@ -29,18 +28,16 @@ const StudentSignup = ({ navigation }) => {
         phone,
         userId: user.uid, // Add user ID to student data
       });
-  
+
       console.log('Signup successful');
       navigation.navigate('Dashboard'); // Navigate to a different screen after successful signup
     } catch (error) {
       console.error('Error during signup:', error);
     }
   };
-  
-  
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, flexDirection: 'column', justifyContent: 'center' }} behavior="padding" enabled keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled keyboardVerticalOffset={100}>
       <ScrollView contentContainerStyle={styles.container}>
         <TextInput
           style={styles.input}
@@ -93,6 +90,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20, // Add some padding to the content
   },
   input: {
     width: '80%',

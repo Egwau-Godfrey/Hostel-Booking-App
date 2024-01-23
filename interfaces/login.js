@@ -1,76 +1,64 @@
-// Import necessary components from React and React Native
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { auth, signInWithEmailAndPassword } from '../firebase/config';
 import AdminLogin from './adminLogin';
 import StudentSignup from './studentsignup';
 import Dashboard from './dashboard';
 
-// Create a functional component for the login page
 const Login = ({ navigation }) => {
-  // State variables to store email and password
   const [email, setemail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      // Call the signInWithEmailAndPassword function
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  
-      // Access the user from userCredential
       const user = userCredential.user;
-  
-      // For simplicity, navigate to the Dashboard component after successful login
       navigation.navigate('Dashboard');
     } catch (error) {
-      // Handle login error
       console.error('Error during login:', error);
     }
   };
 
   return (
-    <View style={styles.container}>
-      {/* email input field */}
-      <TextInput
-        style={styles.input}
-        placeholder="email"
-        onChangeText={(text) => setemail(text)}
-        value={email}
-      />
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled keyboardVerticalOffset={100}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <TextInput
+          style={styles.input}
+          placeholder="email"
+          onChangeText={(text) => setemail(text)}
+          value={email}
+        />
 
-      {/* Password input field */}
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        onChangeText={(text) => setPassword(text)}
-        value={password}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          onChangeText={(text) => setPassword(text)}
+          value={password}
+          secureTextEntry
+        />
 
-      {/* Login button */}
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
-      {/* Link to Admin login */}
-      <TouchableOpacity onPress={() => navigation.navigate('AdminLogin')}>
-        <Text style={styles.link}>Admin Login</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('AdminLogin')}>
+          <Text style={styles.link}>Admin Login</Text>
+        </TouchableOpacity>
 
-      {/* Link to Student signup */}
-      <TouchableOpacity onPress={() => navigation.navigate('StudentSignup')}>
-        <Text style={styles.link}>Student Signup</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity onPress={() => navigation.navigate('StudentSignup')}>
+          <Text style={styles.link}>Student Signup</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-// Styles for the components
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20,
   },
   input: {
     width: '80%',
@@ -96,5 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Export the Login component
 export default Login;
